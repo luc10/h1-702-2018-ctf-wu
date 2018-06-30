@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 1</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="once-upon-a-time">Once upon a time</h1>
+<p>I was scrolling tweets on my phone when I noticed a <a href="https://twitter.com/ITSecurityguard/status/1006299036318687238">tweet</a> posted by <a href="https://twitter.com/ITSecurityguard">Patrik Fehrenbach</a>. Yes, someone’s tried to inject an XSS payload but the most important thing was that <a href="http://hackerone.com/">h1</a> will run another great <strong>CTF</strong> challenge.</p>
+<p>Even if I was/am busy with exams I decided to jump into (my first ever <strong>CTF</strong> challenge) Android one.</p>
+<h3 id="let-the-fun-begin">Let the fun begin</h3>
+<p>The first challenge is a static analysis one. Since an <em>apk</em> is a valid <em>zip</em> archive we can extract the whole content and browse files with a simple command:</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">unzip</span> challenge1_release.apk -d challenge1 <span class="token operator">&amp;&amp;</span> <span class="token function">open</span> <span class="token variable">$_</span>
+</code></pre>
+<p>From this moment until my last dot I’ll mainly use two tools:</p>
+<ul>
+<li><a href="https://www.hex-rays.com/products/ida/support/download_freeware.shtml">IDA</a> (which comes in a free version too);</li>
+<li><a href="https://github.com/skylot/jadx">JADX</a>.</li>
+</ul>
+<p>Once loaded the <em>apk</em> (not only the <em>dex</em> file - afterward, I’ll tell you why) file into <strong>jadx</strong> we’ll notice that there’re 4 total classes:</p>
+<ul>
+<li>BuildConfig;</li>
+<li><strong>MainActivity</strong>;</li>
+<li><strong>FourthPart</strong>;</li>
+<li><strong>R</strong>;</li>
+</ul>
+<p>I’ve highlighted the interesting ones.</p>
+<p>The <strong>MainActivity</strong> one contains the following code:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">oneLastThing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">native</span> String <span class="token function">stringFromJNI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">static</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"native-lib"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle bundle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>bundle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">setContentView</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>activity_main<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span>TextView<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>sample_text<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span><span class="token string">"Reverse the apk!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">doSomething</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">void</span> <span class="token function">doSomething</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"Part 1"</span><span class="token punctuation">,</span> <span class="token string">"The first part of your flag is: \"flag{so_much\""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>The function named <strong>doSomething</strong> contains the first part of our flag (which is <code>flag{so_much</code>) as <strong>FourthPart</strong> class contains the fourth one:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">FourthPart</span> <span class="token punctuation">{</span>
+    String <span class="token function">eight</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"w"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">five</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"_"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">four</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"h"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">one</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"m"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">seven</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"o"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">six</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"w"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">three</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"c"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    String <span class="token function">two</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token string">"u"</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>By imaginary calling each method from <strong>one</strong> to <strong>eight</strong>, we obtain <code>much_wow</code>.</p>
+<p>Time to check if there’s another flag part into our dex file:</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">strings</span> classes.dex <span class="token operator">|</span> <span class="token function">grep</span> -i <span class="token string">"part"</span>
+
+getParticipant
+getParticipants
+mParticipant
+mParticipants
+<span class="token operator">&amp;</span>notification_template_part_chronometer
+notification_template_part_time
+part_3 <span class="token operator">&lt;</span>-----
+participants
+</code></pre>
+<p>Indeed there’s but it’s a reference to a string located into a resource named <strong>strings.xml</strong> (located under <em>resources.arsc/values/</em> - that’s why I told you to open the whole apk with jdax).</p>
+<p>Now we have the third chunk too -&gt; <code>analysis_</code>.</p>
+<h3 id="ndk---n_otyet_d_one_k">NDK - N_otyet_D_one_K?</h3>
+<p>Android let developers build native libraries and bind them directly to Java code using what they call <strong>NDK</strong> and since there’re references to external functions we need to import <strong>lib-nativelib</strong> into <strong>IDA</strong> which once loaded will reveal the second part: <code>_static_</code> under the <strong>stringFromJNI</strong> function body.</p>
+<p><img src="https://i.imgur.com/YaGp4z8.png?1" alt=""></p>
+<p>From java code we noticed there’s <strong>oneLastThing</strong> method too:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">oneLastThing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p><img src="https://i.imgur.com/zWnck7q.png" alt=""></p>
+<p>I’ve to be honest. At this time I felt like 😕… It took me a while to notice that there were other exported functions:</p>
+<p><img src="https://i.imgur.com/bHMLaDg.png" alt=""></p>
+<p>Each one contains a single char that chained to others compose the last part of the flag: <code>_and_cool}</code>.</p>
+<h3 id="my-first-ever-flag">My first ever flag</h3>
+<p>Finally we have the full flag:</p>
+<p><code>flag{so_much_static_analysis_much_wow_and_cool}</code></p>
+</div>
+</body>
+
+</html>

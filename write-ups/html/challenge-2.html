@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 2</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="may-the-bruteforce-be-with-you">May the (brute)force be with you</h1>
+<p>Challenge #2 was a bit messy. The first release was using a bugged algorithm which generates different keys for the same pin code. I thought it was specifically designed to drive everybody crazy so I dug around the code looking for hints or the flag itself.</p>
+<h2 id="the-revelation">The revelation</h2>
+<p>A couple of days after it turns out that the challenge was unsolvable and I was like 💣💥💢.</p>
+<h2 id="our-old-friend-jadx">Our old friend Jadx</h2>
+<p>The app shows us a pin lock view:</p>
+<p><img src="https://i.imgur.com/9TpqNpy.png" alt=""></p>
+<p>As always we need to start from Java sources:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MainActivity</span> <span class="token keyword">extends</span> <span class="token class-name">AppCompatActivity</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">private</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> cipherText<span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">private</span> PinLockListener mPinLockListener <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PinLockListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onComplete</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            String str2 <span class="token operator">=</span> MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>TAG<span class="token punctuation">;</span>
+            StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"Pin complete: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            str <span class="token operator">=</span> MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"DECRYPTED"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">SecretBox</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decrypt</span><span class="token punctuation">(</span><span class="token string">"aabbccddeeffgghhaabbccdd"</span><span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>cipherText<span class="token punctuation">)</span><span class="token punctuation">,</span> StandardCharsets<span class="token punctuation">.</span>UTF_8<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span><span class="token string">"PROBLEM"</span><span class="token punctuation">,</span> <span class="token string">"Unable to decrypt text"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">getKey</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">resetCoolDown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">static</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"native-lib"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> String <span class="token function">bytesToHex</span><span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> bArr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle bundle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>cipherText <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">"9646D13EC8F8617D1CEA1CF4334940824C700ADF6A7A3236163CA2C9604B9BE4BDE770AD698C02070F571A0B612BBD3572D81F99"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>I’ve redacted useless parts for analysis. What we know now:</p>
+<ul>
+<li>the cipher text is <code>9646D13EC8F8617D1CEA1CF4334940824C700ADF6A7A3236163CA2C9604B9BE4BDE770AD698C02070F571A0B612BBD3572D81F99</code>;</li>
+<li><strong>SecretBox</strong> class is used to decipher the flag - imported from <a href="https://download.libsodium.org/">libsodium</a>;</li>
+<li>since <strong>SecretBox</strong> requires a <strong>noonce</strong> we must assume that <code>aabbccddeeffgghhaabbccdd</code> is our <strong>noonce</strong>;</li>
+<li>there’re two methods imported from <strong>libnative-lib</strong>:<br>
+- <strong>getKey</strong>;<br>
+- <strong>resetCoolDown</strong>.</li>
+</ul>
+<p>As you probably noticed, <strong>getKey</strong> method returns a byte array. The method must be fed with a <strong>String</strong> (which is the pin code we entered) and it returns the equivalent key.</p>
+<h3 id="no-android-studio-tut-please">No Android Studio tut, please!</h3>
+<p>I thought about two solutions to this problem:</p>
+<ol>
+<li>
+<p>write an app, embed the library, invoke <strong>getKey</strong> method for every possible combination (from 000000 to 999999), save each key in a file, pull the file from the emulator and try each key with another crafted tool;<br>
+- <strong>PROS</strong>: time saving;<br>
+- <strong>CONS</strong>: no fun 😜.</p>
+</li>
+<li>
+<p>reverse the algorithm and write a tool;<br>
+- <strong>PROS</strong>: elegant solution - can be this a pro?! -, fun, fun, fun!<br>
+- <strong>CONS</strong>: a lot.</p>
+</li>
+</ol>
+<p>Approaching the challenge with the first solution will end up with an Android Studio tutorial instead of a write-up.</p>
+<h2 id="reversing-the-algorithm">Reversing the algorithm</h2>
+<p>Don’t be scared, <strong>IDA</strong> has a graph view that makes reversing more comfortable 😅:</p>
+<p><img src="https://i.imgur.com/Cwr6Gz1.png" alt=""></p>
+<p>Quite huge, don’t you think?!</p>
+<p>The first part is simple:</p>
+<p><img src="https://i.imgur.com/0BxfNxL.png" alt=""></p>
+<p>Our pin code is converted to a char[] and its pointer is kept by <strong>r12</strong> which is used below. The strange thing is that <strong>gettimeofday</strong> is called 😕.</p>
+<p><a href="http://man7.org/linux/man-pages/man2/gettimeofday.2.html">gettimeofday</a> returns a <strong>timeval</strong> struct defined as follow:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">struct</span> timeval <span class="token punctuation">{</span>
+    time_t      tv_sec<span class="token punctuation">;</span>     <span class="token comment">/* seconds */</span>
+    suseconds_t tv_usec<span class="token punctuation">;</span>    <span class="token comment">/* microseconds */</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// time_t and suseconds_t are both 8 bytes var</span>
+</code></pre>
+<p><strong>r12</strong> is passed to <strong>strlen</strong>. If the result is 0 the function is exited.</p>
+<p><img src="https://i.imgur.com/AZTfDDW.png" alt=""></p>
+<p>After the check the code enters into a loop:</p>
+<p><img src="https://i.imgur.com/BsoL32i.png" alt=""></p>
+<p>To convert it into c-lookalike-code:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>pin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">char</span> b <span class="token operator">=</span> pin<span class="token punctuation">[</span>i <span class="token operator">%</span> len<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>b <span class="token operator">-</span> <span class="token number">48</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+
+    i<span class="token operator">++</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Here I started thinking that <strong>tv.tv_sec</strong> and <strong>tv.tv_usec</strong> were used to store bytes since they’re packed into a struct.</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">struct</span> timeval <span class="token punctuation">{</span>
+    time_t      uint64<span class="token punctuation">;</span>
+    suseconds_t uint64<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Can be considered the same as</span>
+
+<span class="token keyword">struct</span> timeval <span class="token punctuation">{</span>
+    time_t      byte<span class="token punctuation">[</span><span class="token number">0x08</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    suseconds_t byte<span class="token punctuation">[</span><span class="token number">0x08</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>To better understand this theory I’ll enter the else statement first:</p>
+<p><img src="https://i.imgur.com/FUGe0On.png" alt=""></p>
+<p>I got it! <strong>al</strong> contains the original digit of our pin code for current loop (<code>char b = pin[i % len];</code>). When its raw value is bigger than 7 it’s copied to fill the whole <strong>tv_sec</strong> field and a null terminator is added (<code>mov [tv.tv_usec], 0</code>) by setting the first byte of <strong>tv_usec</strong> field to <strong>0</strong>.</p>
+<p>We can edit our code:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>pin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">char</span> b <span class="token operator">=</span> pin<span class="token punctuation">[</span>i <span class="token operator">%</span> len<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>b <span class="token operator">-</span> <span class="token number">48</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">||</span> b <span class="token operator">-</span> <span class="token number">48</span> <span class="token operator">&lt;=</span> <span class="token number">7</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        tv<span class="token punctuation">.</span>tv<span class="token punctuation">.</span>sec<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        tv<span class="token punctuation">.</span>tv_sec<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        tv<span class="token punctuation">.</span>tv_sec<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        tv<span class="token punctuation">.</span>tv_usec<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    i<span class="token operator">++</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Before getting further I’d like to write something about this little piece of code which helped me a lot:</p>
+<p><img src="https://i.imgur.com/yLndCdT.png" alt=""></p>
+<p>This one was driving me crazy initially. A loop which appends something somewhere. At this point I thought <em>would you bet that this is linked to digit “9”?</em> and right after <em>would you bet that the code does the same thing for every digit except for “0” one?</em>.</p>
+<p>I know that probably it sounds odd but you’ve to understand that every time you perform a static analysis every section of code is analyzed more and more that you start thinking to be made of bytes instead of <code>mov rdi, 60</code>  water 😜.</p>
+<p>Everything the code does until here is to repeat the pin <strong>digit</strong> <strong>n</strong> times where <strong>n</strong> is exactly the digit raw value.<br>
+For example, if our current <strong>digit</strong> is “4”, <strong>tv.tv.sec</strong> (from now I’ll refer to it using <strong>buffer</strong>) will be filled with <code>4444</code>. If it’s “5” with <code>55555</code> and so on.</p>
+<p>Said that here you’re the last part:</p>
+<p><img src="https://i.imgur.com/UWC4sZv.png" alt=""></p>
+<p>This chunk is reached when the <strong>raw value</strong> is equal to <strong>0</strong> or after the whole flow described above. I’ll make it easy:</p>
+<pre class=" language-c"><code class="prism  language-c">byte buffer<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> key<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> v<span class="token punctuation">,</span> x<span class="token punctuation">,</span> k<span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> k <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>pin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">char</span> b <span class="token operator">=</span> pin<span class="token punctuation">[</span>i <span class="token operator">%</span> len<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> n <span class="token operator">=</span> b <span class="token operator">-</span> <span class="token number">48</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>n <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> x<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            buffer<span class="token punctuation">[</span>x<span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    v <span class="token operator">=</span> <span class="token number">0x811c9dc5</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> x<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        v <span class="token operator">=</span> <span class="token number">0x1000193</span> <span class="token operator">*</span> <span class="token punctuation">(</span>v <span class="token operator">^</span> buffer<span class="token punctuation">[</span>x<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    key<span class="token punctuation">[</span>k <span class="token operator">%</span> <span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">^</span><span class="token operator">=</span> v<span class="token punctuation">;</span>
+    i<span class="token operator">++</span><span class="token punctuation">;</span> k<span class="token operator">++</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>A right question will be: <em>what if the digit is “0”?</em> When it’s “0” the <strong>buffer</strong> isn’t changed meaning that the one generated by the previous digit is used.</p>
+<p>This helps to understand that since the <strong>buffer</strong> is initially filled with real epoch values, our pin code can’t start with “0” digits or the resulting key will not be the same for every execution. Cool, we can limit the range by 100 000 values!</p>
+<p><strong>PS</strong>: the <strong>while</strong> loop condition is <code>(i &lt; 12)</code>.</p>
+<h2 id="no-need-to-reinvent-the-wheel">No need to reinvent the wheel</h2>
+<p>The last step requires to decipher the text. As the title says, there’s no need to reinvent the wheel since <a href="https://download.libsodium.org/doc/bindings_for_other_languages/">libsodium</a> has a lot of bindings.</p>
+<p><a href="http://twitter.com/jobertabma/">@Jobert</a>: if you’re reading this, guess which language - your favorite - has native support? (💡 it starts with P).</p>
+<h2 id="challenge-2-completed---brain-totally-burnt-out">Challenge 2 completed - brain totally burnt out</h2>
+<p><a href="https://github.com/luc10/h1-702-2018-ctf-wu/challenge-2/">Here</a> you’ll find my golang implementation of this algorithm. Unfortunately, <a href="https://play.golang.org/">https://play.golang.org/</a> can’t run code with external dependencies so you’ve to install go runtimes. A good occasion to learn a new language 😆.</p>
+<p>The second flag is:</p>
+<p><code>flag{wow_yall_called_a_lot_of_func$}</code></p>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 3</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="deodex-is-not-for-armpits">Deodex is not for armpits</h1>
+<p>~ While solving the 3rd challenge I was thinking to a deodorant applicator all the time ~</p>
+<p>Said that we can get down to business.</p>
+<h2 id="optimized-dex">Optimized DEX</h2>
+<p>ODEX stands for Optimized DEX. Basically, they are memory optimized applications/application components. We need to grab two tools:</p>
+<ul>
+<li><a href="https://bitbucket.org/JesusFreke/smali/downloads/baksmali-2.2.4.jar">backsmali</a>;</li>
+<li><a href="https://bitbucket.org/JesusFreke/smali/downloads/smali-2.2.4.jar">smali</a>.</li>
+</ul>
+<p>We’ll use the first one to extract smali files from odex and the second one to build a dex file starting from these.</p>
+<h2 id="terminal-wake-up">Terminal, wake up!</h2>
+<p>It’s time to launch some commands:</p>
+<pre class=" language-bash"><code class="prism  language-bash">$ <span class="token function">cd</span> working_dir
+$ <span class="token function">unzip</span> challenge3_release.apk -d challenge3 <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> <span class="token variable">$_</span>
+$ <span class="token function">wget</span> https://bitbucket.org/JesusFreke/smali/downloads/baksmali-2.2.4.jar
+$ <span class="token function">wget</span> https://bitbucket.org/JesusFreke/smali/downloads/smali-2.2.4.jar
+$ <span class="token function">java</span> -jar baksmali-2.2.4.jar x -o deodexed -b boot.oat base.odex
+$ <span class="token function">java</span> -jar smali-2.2.4.jar a deodexed -o classes.dex
+</code></pre>
+<p>We can now feed <strong>jadx</strong> with a dex file.</p>
+<h2 id="your-first-symmetric-cipher">Your first symmetric cipher</h2>
+<p>Have you ever developed a symmetric cipher using a <strong>^</strong> (xor) operator? I did it! The challenge uses a simple xor cipher and a key which is <code>this_is_a_k3y</code>:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span> key <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">'t'</span><span class="token punctuation">,</span> <span class="token string">'h'</span><span class="token punctuation">,</span> <span class="token string">'i'</span><span class="token punctuation">,</span> <span class="token string">'s'</span><span class="token punctuation">,</span> <span class="token string">'_'</span><span class="token punctuation">,</span> <span class="token string">'i'</span><span class="token punctuation">,</span> <span class="token string">'s'</span><span class="token punctuation">,</span> <span class="token string">'_'</span><span class="token punctuation">,</span> <span class="token string">'a'</span><span class="token punctuation">,</span> <span class="token string">'_'</span><span class="token punctuation">,</span> <span class="token string">'k'</span><span class="token punctuation">,</span> <span class="token string">'3'</span><span class="token punctuation">,</span> <span class="token string">'y'</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">hexStringToByteArray</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> length <span class="token operator">=</span> str<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> bArr <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token punctuation">(</span>length <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> length<span class="token punctuation">;</span> i <span class="token operator">+=</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            bArr<span class="token punctuation">[</span>i <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>Character<span class="token punctuation">.</span><span class="token function">digit</span><span class="token punctuation">(</span>str<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">+</span> Character<span class="token punctuation">.</span><span class="token function">digit</span><span class="token punctuation">(</span>str<span class="token punctuation">.</span><span class="token function">charAt</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> bArr<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">checkFlag</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        String encryptDecrypt <span class="token operator">=</span>
+            <span class="token function">encryptDecrypt</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token function">hexStringToByteArray</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token string">"kO13t41Oc1b2z4F5F1b2BO33c2d1c61OzOdOtO"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">reverse</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"O"</span><span class="token punctuation">,</span> <span class="token string">"0"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"t"</span><span class="token punctuation">,</span> <span class="token string">"7"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"B"</span><span class="token punctuation">,</span> <span class="token string">"8"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"z"</span><span class="token punctuation">,</span> <span class="token string">"a"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"F"</span><span class="token punctuation">,</span> <span class="token string">"f"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">"k"</span><span class="token punctuation">,</span> <span class="token string">"e"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">encryptDecrypt</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">[</span><span class="token punctuation">]</span> cArr<span class="token punctuation">,</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> bArr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> bArr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>bArr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">^</span> cArr<span class="token punctuation">[</span>i <span class="token operator">%</span> cArr<span class="token punctuation">.</span>length<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> stringBuilder<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>We’ve just to reverse the string <code>kO13t41Oc1b2z4F5F1b2BO33c2d1c61OzOdOtO</code> and globally replace chars:</p>
+<ul>
+<li><strong>O</strong> with <strong>0</strong> (zero);</li>
+<li><strong>t</strong> with <strong>7</strong>;</li>
+<li><strong>B</strong> with <strong>8</strong>;</li>
+<li><strong>z</strong> with <strong>a</strong>;</li>
+<li><strong>F</strong> with <strong>f</strong> (useless);</li>
+<li><strong>k</strong> with <strong>e</strong>.</li>
+</ul>
+<p>This ends up in a hex string which is converted to a byte array and passed to <strong>encryptDecrypt</strong> method.</p>
+<h2 id="my-second-love-golang">My second love: GoLang</h2>
+<p>First one is reverse engineering 😜<br>
+<a href="https://golang.org/">GoLang</a> has basically everything you need to solve the problem except for a <strong>strings.reverse</strong> method. No, that one has never been added as a native method…</p>
+<p><a href="https://github.com/luc10/h1-702-2018-ctf-wu/challenge-3/">Here</a> you’ll find the code to decipher the flag.</p>
+<p>If you don’t want to install golang you can copy, paste and run the code <a href="https://play.golang.org/">here</a>. Pretty cool, right?</p>
+<p>The third flag is:</p>
+<p><code>flag{secr3t_littl3_th4ng}</code></p>
+</div>
+</body>
+
+</html>

