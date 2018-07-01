@@ -110,7 +110,7 @@ I've to be honest. At this time I felt like :confused:... It took me a while to 
 
 ![](https://i.imgur.com/bHMLaDg.png)
 
-Each one contains a single char that chained to others compose the last part of the flag: `_and_cool}`.
+Each one returns a single char that chained to others compose the last part of the flag: `_and_cool}`.
 
 ### My first ever flag
 
