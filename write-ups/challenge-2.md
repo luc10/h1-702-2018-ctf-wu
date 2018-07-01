@@ -256,7 +256,7 @@ The last step requires to decipher the text. As the title says, there's no need 
 
 ## Challenge 2 completed - brain totally burnt out
 
-[Here](https://github.com/luc10/h1-702-2018-ctf-wu/challenge-2) you'll find my golang implementation of this algorithm. Unfortunately, [https://play.golang.org/](https://play.golang.org/) can't run code with external dependencies so you've to install go runtimes. A good occasion to learn a new language :satisfied:.
+[Here](https://github.com/luc10/h1-702-2018-ctf-wu/tree/master/challenge-2) you'll find my golang implementation of this algorithm. Unfortunately, [https://play.golang.org/](https://play.golang.org/) can't run code with external dependencies so you've to install go runtimes. A good occasion to learn a new language :satisfied:.
 
 The second flag is:
 

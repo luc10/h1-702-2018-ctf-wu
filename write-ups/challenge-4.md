@@ -563,7 +563,7 @@ Probably, while coding, someone forgot to assign/reassign **seed** value once th
 
 To save time I've hardcoded each possible solution (totally 4) into the final app that you can find in my repo.
 
-https://github.com/luc10/h1-702-2018-ctf-wu/challenge-4/
+https://github.com/luc10/h1-702-2018-ctf-wu/tree/master/challenge-4/
 
 ## 500 Internal Server Error
 

@@ -684,7 +684,7 @@ In case you forgot it:
 
 Probably the big issue for this challenge was the lack of 64bit integer support in javascript. I had to type more code to handle them than the code to exploit the bug.
 
-[Here](https://github.com/luc10/h1-702-2018-ctf-wu/challenge-5/) you can find the whole source of the exploit.
+[Here](https://github.com/luc10/h1-702-2018-ctf-wu/tree/master/challenge-5/) you can find the whole source of the exploit.
 
 ## Summing up
 

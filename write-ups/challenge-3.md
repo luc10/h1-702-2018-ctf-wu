@@ -85,7 +85,7 @@ This ends up in a hex string which is converted to a byte array and passed to **
 First one is reverse engineering :stuck_out_tongue_winking_eye:
 [GoLang](https://golang.org/) has basically everything you need to solve the problem except for a **strings.reverse** method. No, that one has never been added as a native method...
 
-[Here](https://github.com/luc10/h1-702-2018-ctf-wu/challenge-3/) you'll find the code to decipher the flag.
+[Here](https://github.com/luc10/h1-702-2018-ctf-wu/tree/master/challenge-3/) you'll find the code to decipher the flag.
 
 If you don't want to install golang you can copy, paste and run the code [here](https://play.golang.org/). Pretty cool, right?
 
